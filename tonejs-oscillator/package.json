@@ -1,0 +1,17 @@
+{
+  "name": "tonejs-oscillator",
+  "version": "1.0.0",
+  "description": "",
+  "local-web-server": {
+    "port": 8100,
+    "forbid": "*.json"
+  },
+  "scripts": {
+    "start": "ws"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "local-web-server": "^1.2.7"
+  }
+}

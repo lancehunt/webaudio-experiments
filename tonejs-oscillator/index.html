@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Oscillator Demo</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<link rel="icon" type="image/png" sizes="174x174" href="./style/favicon.png">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/0.10.0/Tone.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/draggabilly/2.1.1/draggabilly.pkgd.min.js"></script>
+		<script src="./scripts/index.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="./style/main.css">
+	</head>
+	<body>
+		<div id="Content">
+			<div id="DragContainer">
+			</div>
+		</div>
+		<script>
+			var osc = new Tone.Oscillator({
+			"frequency" : 440,
+			"volume" : -10
+			}).toMaster();
+
+			Interface.Dragger({
+						tone : osc,
+						x : {
+							param : "frequency",
+							min : 60,
+							max : 2000,
+							exp : 2
+						},
+						y : {
+							param : "volume",
+							min : -40,
+							max : 0
+						},
+						start : function(){
+							osc.start();
+							Tone.Master.volume.rampTo(0, 0.05);
+						},
+						end : function(){
+							//so it doesn't click
+							Tone.Master.volume.rampTo(-Infinity, 0.05);
+						}
+					});
+
+
+			$('#DragContainer .Dragger #Name').text('');
+		</script>
+
+	</body>
+</html>
