@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Tone Tilt</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<!--<link rel="icon" type="image/png" sizes="174x174" href="./style/favicon.png">-->
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/0.10.0/Tone.min.js"></script>
+		<script src="./scripts/nexusUI.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="./style/main.css">
+	</head>
+	<body>
+		<div id="content">
+			<div id="pads">
+				<canvas id="matrix1" nx="matrix" style="width:100%;height:100%"></canvas>
+			</div>
+			<div id="controls">
+				<canvas id="tilt1" nx="tilt" style="width:100%;height:100%"></canvas>
+			</div>
+			<div id="output" style="width:100%;height:1em"></div>
+			<div id="dials" style="width:100%;">
+				<canvas nx="dial" min="0" max="100" label="freq"></canvas>
+				<canvas nx="dial" min="0" max="100" label="vol"></canvas>
+				<canvas id="onoff" nx="toggle"></canvas>
+			</div>
+		</div>
+		<script>
+  			nx.onload = function() {
+
+				nx.colorize("#00CCFF")
+				nx.colorize("border", "#ffffff")
+				nx.colorize("fill", "#333333")
+				matrix1.row = 3;
+				matrix1.col = 3;
+				matrix1.init();
+				tilt1.text = '*';
+
+				var osc = new Tone.Oscillator({
+					"frequency" : 440,
+					"volume" : -30
+				}).toMaster();
+
+				onoff.on('*', function(data) {
+					if(onoff.val) {
+						if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+							$("body").addClass("Mobile");
+							var context = Tone.context
+							var buffer = context.createBuffer(1, 1, context.sampleRate)
+							var source = context.createBufferSource()
+							source.buffer = buffer
+							source.connect(context.destination)
+							source.start(0)
+							// source.noteOn(0)
+
+							// resume the audio context
+							if (context.resume){
+								context.resume()
+							}
+						}
+						osc.start();
+						Tone.Master.volume.rampTo(0, 0.05);
+					}
+					else {
+						// For some reason this doesnt turn it off!! :(
+						// Tone.Master.volume.rampTo(-Infinity, 0.05)
+					}
+				});
+
+				tilt1.on('*', function(data){
+					let freq = Math.min(Math.max((data.x + 1) * 1000, 60), 2000)
+					let vol = Math.min(Math.max((((data.y + 1) * 1000) / 50) * -1, -40), 0)
+					osc.set('frequency', freq);
+					osc.set('volume', vol);
+					// $('div#output').text(freq + "x" + data.x);
+					// $('div#output').text(vol + "y" + data.y);
+				})
+
+				// matrix1.on('*', function(data) {
+				// 	$('div#output').text(JSON.stringify(data));
+				// })
+
+				// nx.allTraffic(function(data){
+				// })
+
+				// nx.sendsTo(function(data) {
+				// 	// Transmit data to Server!
+				// 	// $('#dials').text(JSON.stringify(data));
+				// })
+			}
+		</script>
+	</body>
+</html>
