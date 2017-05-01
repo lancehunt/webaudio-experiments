@@ -61,7 +61,7 @@
 				var tremolo = new Tone.Tremolo(9, 0.75).toMaster().start();
 				var vibrato = new Tone.Vibrato(440, 1).toMaster();
 
-				let s1 = createSynth(notes, sawtoothSynth).connect(reverb);
+				let s1 = createSynth(notes, sawtoothSynth).chain(phaser,feedbackDelay);
 				// let s1 = createSynth(notes, squareSynth);
 				// let s1 = createNoiseSynth(notes, snareNoiseSynth);
 				// let s1 = createMonoSynth(bassNotes, bassMonoSynth);
@@ -78,10 +78,10 @@
 						s1.volume.rampTo(0, 0.05);
 					}
 				});
-
+				var thirteenth = 153.846153846153846
 				tilt1.on('*', function(data){
-					let xx = Math.min(Math.max((((data.x +1) * 1000) /2 ) / 76.92, 0), 13)
-					let yy = Math.min(Math.max((((data.y +1) * 1000) /2 ) / 76.92, 0), 13)
+					let xx = Math.min(Math.max((((data.x +1) * 1000) ) / thirteenth, 0), 13)
+					let yy = Math.min(Math.max((((data.y +1) * 1000) ) / thirteenth, 0), 13)
 					let note = ((xx + yy) / 2).toFixed(0)
 					$('div#output').text("note=" + note);
 					s1.setCurrentTone(note);
