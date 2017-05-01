@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SynthFx</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/0.10.0/Tone.min.js"></script>
+		<script src="./scripts/nexusUI.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="./style/main.css">
+	</head>
+	<body>
+		<div id="content">
+			<div id="pads">
+				<canvas id="matrix1" nx="matrix" style="width:100%;height:100%"></canvas>
+			</div>
+			<div id="controls">
+				<canvas id="tilt1" nx="tilt" style="width:100%;height:100%"></canvas>
+			</div>
+			<div id="output" style="width:100%;height:1em"></div>
+			<div id="dials" style="width:100%;">
+				<canvas id="onoff" nx="toggle"></canvas>
+			</div>
+		</div>
+		<script>
+			$("body").addClass("Mobile");
+
+  			nx.onload = function() {
+
+				nx.colorize("#00CCFF")
+				nx.colorize("border", "#ffffff")
+				nx.colorize("fill", "#333333")
+				matrix1.row = 4;
+				matrix1.col = 4;
+				matrix1.init();
+				tilt1.text = '*';
+
+				Tone.Master.volume.rampTo(0, 0.05);
+
+				let notes = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"];
+				let bassNotes = ["C2", "C3", "D2", "E2", "D2", "A1"];
+				let sawtoothSynth   = { oscillator: { type: "sawtooth3" }, envelope: { attack: .01, decay: .3, sustain: .2, release: 1.5 } };
+				let squareSynth     = { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } };
+				let pianoPolySynth = { "volume": -8, "oscillator": { "partials": [1, 2, 1], }, "portamento": 0.05 };
+				let bassMonoSynth   = { volume: -10, envelope: { attack: 0.1, decay: 0.3, release: 2, }, filterEnvelope: { attack: 0.001, decay: 0.01, sustain: 0.5, baseFrequency: 200, octaves: 2.6 } };
+				let snareNoiseSynth = { volume: -5, envelope: { attack: 0.001, decay: 0.2, sustain: 0 }, filterEnvelope: { attack: 0.001, decay: 0.1, sustain: 0 } };
+
+				var chorus = new Tone.Chorus(4, 2.5, 0.5).receive("chorus").toMaster();
+				var wah = new Tone.AutoWah(50, 6, -30).toMaster();
+				var crusher = new Tone.BitCrusher(4).toMaster();
+				var autoFilter = new Tone.AutoFilter("4n").toMaster().start();
+				var cheby = new Tone.Chebyshev(50).toMaster();
+				var feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toMaster();
+				var freeverb = new Tone.Freeverb().toMaster();
+				var reverb = new Tone.JCReverb(0.4).connect(Tone.Master);
+				var phaser = new Tone.Phaser({ "frequency" : 15, "octaves" : 5, "baseFrequency" : 1000 }).toMaster();
+				var pingPong = new Tone.PingPongDelay("4n", 0.2).toMaster();
+				var tremolo = new Tone.Tremolo(9, 0.75).toMaster().start();
+				var vibrato = new Tone.Vibrato(440, 1).toMaster();
+
+				let s1 = createSynth(notes, sawtoothSynth).connect(reverb);
+				// let s1 = createSynth(notes, squareSynth);
+				// let s1 = createNoiseSynth(notes, snareNoiseSynth);
+				// let s1 = createMonoSynth(bassNotes, bassMonoSynth);
+				// let s1 = createPolySynth(notes, pianoPolySynth);
+
+				onoff.on('*', function(data) {
+					if(onoff.val) {
+						initializeAudio();
+						Tone
+						Tone.Master.volume.rampTo(0, 0.05);
+					}
+					else {
+						s1.release();
+						s1.volume.rampTo(0, 0.05);
+					}
+				});
+
+				tilt1.on('*', function(data){
+					let xx = Math.min(Math.max((((data.x +1) * 1000) /2 ) / 76.92, 0), 13)
+					let yy = Math.min(Math.max((((data.y +1) * 1000) /2 ) / 76.92, 0), 13)
+					let note = ((xx + yy) / 2).toFixed(0)
+					$('div#output').text("note=" + note);
+					s1.setCurrentTone(note);
+					s1.attack();
+				})
+
+				matrix1.on('*', function(data) {
+					$('div#output').text(JSON.stringify(data));
+				})
+			}
+
+			function initializeAudio() {
+				if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+					var context = Tone.context
+					var buffer = context.createBuffer(1, 1, context.sampleRate)
+					var source = context.createBufferSource()
+					source.buffer = buffer
+					source.connect(context.destination)
+					source.start(0)
+
+					// resume the audio context
+					if (context.resume){
+						context.resume()
+					}
+				}
+			}
+
+			function createSynth(notes, definition) {
+				var synth = new Tone.Synth(definition).toMaster();
+
+                synth.notes = notes,
+                synth.currentTone = synth.notes[0],
+                synth.setCurrentTone = function(t) {
+                    synth.isAttacking && synth.notes[t] != synth.currentTone && (synth.currentTone = synth.notes[t],
+                    synth.triggerAttack(synth.currentTone))
+                };
+
+                synth.attack = function() {
+                    synth.triggerAttack(synth.currentTone),
+                    synth.isAttacking = !0
+                };
+
+                synth.release = function() {
+                    synth.triggerRelease(),
+                    synth.isAttacking = !1
+                }
+
+				return synth;
+			}
+
+
+			function createMonoSynth(notes, definition) {
+				var synth = new Tone.MonoSynth(definition).toMaster();
+
+                synth.notes = notes,
+                synth.currentTone = synth.notes[0],
+                synth.setCurrentTone = function(t) {
+                    synth.isAttacking && synth.notes[t] != synth.currentTone && (synth.currentTone = synth.notes[t],
+                    synth.triggerAttack(synth.currentTone))
+                };
+
+                synth.attack = function() {
+                    synth.triggerAttack(synth.currentTone),
+                    synth.isAttacking = !0
+                };
+
+                synth.release = function() {
+                    synth.triggerRelease(),
+                    synth.isAttacking = !1
+                }
+
+				return synth;
+			}
+
+			function createMembraneSynth(notes, definition) {
+				var synth = new Tone.MembraneSynth(definition).toMaster();
+
+                synth.notes = notes,
+                synth.currentTone = synth.notes[0],
+                synth.setCurrentTone = function(t) {
+                    synth.isAttacking && synth.notes[t] != synth.currentTone && (synth.currentTone = synth.notes[t],
+                    synth.triggerAttack(synth.currentTone))
+                };
+
+                synth.attack = function() {
+                    synth.triggerAttack(synth.currentTone),
+                    synth.isAttacking = !0
+                };
+
+                synth.release = function() {
+                    synth.triggerRelease(),
+                    synth.isAttacking = !1
+                }
+
+				return synth;
+			}
+			function createPolySynth(notes, definition) {
+				var synth = new Tone.PolySynth(4, Tone.Synth, definition).toMaster();
+
+                synth.notes = notes,
+                synth.currentTone = synth.notes[0],
+                synth.setCurrentTone = function(t) {
+                    synth.isAttacking && synth.notes[t] != synth.currentTone && (synth.currentTone = synth.notes[t],
+                    synth.triggerAttack(synth.currentTone))
+                };
+
+                synth.attack = function() {
+                    synth.triggerAttack(synth.currentTone),
+                    synth.isAttacking = !0
+                };
+
+                synth.release = function() {
+                    synth.triggerRelease(),
+                    synth.isAttacking = !1
+                }
+
+				return synth;
+			}
+
+			function createNoiseSynth(notes, definition) {
+				var synth = new Tone.NoiseSynth(definition).toMaster();
+
+                synth.notes = notes,
+                synth.currentTone = synth.notes[0],
+                synth.setCurrentTone = function(t) {
+                    synth.isAttacking && synth.notes[t] != synth.currentTone && (synth.currentTone = synth.notes[t],
+                    synth.triggerAttack(synth.currentTone))
+                };
+
+                synth.attack = function() {
+                    synth.triggerAttack(synth.currentTone),
+                    synth.isAttacking = !0
+                };
+
+                synth.release = function() {
+                    synth.triggerRelease(),
+                    synth.isAttacking = !1
+                }
+
+				return synth;
+			}
+		</script>
+	</body>
+</html>
