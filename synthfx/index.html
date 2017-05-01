@@ -42,26 +42,26 @@
 
 			Tone.Master.volume.rampTo(0, 0.05);
 
-			let notes = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"];
-			let bassNotes = ["C2", "C3", "D2", "E2", "D2", "A1"];
-			let sawtoothSynth = { oscillator: { type: "sawtooth3" }, envelope: { attack: .01, decay: .3, sustain: .2, release: 1.5 } };
-			let squareSynth = { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } };
-			let pianoPolySynth = { "volume": -8, "oscillator": { "partials": [1, 2, 1], }, "portamento": 0.05 };
-			let bassMonoSynth = { volume: -10, envelope: { attack: 0.1, decay: 0.3, release: 2, }, filterEnvelope: { attack: 0.001, decay: 0.01, sustain: 0.5, baseFrequency: 200, octaves: 2.6 } };
+			let notes 			= ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"];
+			let bassNotes 		= ["C2", "C3", "D2", "E2", "D2", "A1"];
+			let sawtoothSynth 	= { oscillator: { type: "sawtooth3" }, envelope: { attack: .01, decay: .3, sustain: .2, release: 1.5 } };
+			let squareSynth 	= { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } };
+			let pianoPolySynth 	= { "volume": -8, "oscillator": { "partials": [1, 2, 1], }, "portamento": 0.05 };
+			let bassMonoSynth 	= { volume: -10, envelope: { attack: 0.1, decay: 0.3, release: 2, }, filterEnvelope: { attack: 0.001, decay: 0.01, sustain: 0.5, baseFrequency: 200, octaves: 2.6 } };
 			let snareNoiseSynth = { volume: -5, envelope: { attack: 0.001, decay: 0.2, sustain: 0 }, filterEnvelope: { attack: 0.001, decay: 0.1, sustain: 0 } };
 
-			var chorus = new Tone.Chorus(4, 2.5, 0.5).receive("chorus").toMaster();
-			var wah = new Tone.AutoWah(50, 6, -30).toMaster();
-			var crusher = new Tone.BitCrusher(4).toMaster();
-			var autoFilter = new Tone.AutoFilter("4n").toMaster().start();
-			var cheby = new Tone.Chebyshev(50).toMaster();
-			var feedbackDelay = new Tone.FeedbackDelay("8n", 0.5).toMaster();
-			var freeverb = new Tone.Freeverb().toMaster();
-			var reverb = new Tone.JCReverb(0.4).connect(Tone.Master);
-			var phaser = new Tone.Phaser({ "frequency": 15, "octaves": 5, "baseFrequency": 1000 }).toMaster();
-			var pingPong = new Tone.PingPongDelay("4n", 0.2).toMaster();
-			var tremolo = new Tone.Tremolo(9, 0.75).toMaster().start();
-			var vibrato = new Tone.Vibrato(440, 1).toMaster();
+			var chorus 			= new Tone.Chorus(4, 2.5, 0.5).receive("chorus").toMaster();
+			var wah 			= new Tone.AutoWah(50, 6, -30).toMaster();
+			var crusher 		= new Tone.BitCrusher(4).toMaster();
+			var autoFilter 		= new Tone.AutoFilter("4n").toMaster().start();
+			var cheby 			= new Tone.Chebyshev(50).toMaster();
+			var feedbackDelay 	= new Tone.FeedbackDelay("8n", 0.5).toMaster();
+			var freeverb 		= new Tone.Freeverb().toMaster();
+			var reverb 			= new Tone.JCReverb(0.4).connect(Tone.Master);
+			var phaser 			= new Tone.Phaser({ "frequency": 15, "octaves": 5, "baseFrequency": 1000 }).toMaster();
+			var pingPong 		= new Tone.PingPongDelay("4n", 0.2).toMaster();
+			var tremolo 		= new Tone.Tremolo(9, 0.75).toMaster().start();
+			var vibrato 		= new Tone.Vibrato(440, 1).toMaster();
 
 			let s1 = createSynth(notes, sawtoothSynth).chain(phaser, feedbackDelay);
 			// let s1 = createSynth(notes, squareSynth);

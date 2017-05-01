@@ -40,11 +40,11 @@
 
 				Tone.Master.volume.rampTo(0, 0.05);
 
-				let notes = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"];
-				let bassNotes = ["C2", "C3", "D2", "E2", "D2", "A1"];
+				let notes 			= ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"];
+				let bassNotes 		= ["C2", "C3", "D2", "E2", "D2", "A1"];
 				let sawtoothSynth   = { oscillator: { type: "sawtooth3" }, envelope: { attack: .01, decay: .3, sustain: .2, release: 1.5 } };
 				let squareSynth     = { oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.2 } };
-				let pianoPolySynth = { "volume": -8, "oscillator": { "partials": [1, 2, 1], }, "portamento": 0.05 };
+				let pianoPolySynth	= { "volume": -8, "oscillator": { "partials": [1, 2, 1], }, "portamento": 0.05 };
 				let bassMonoSynth   = { volume: -10, envelope: { attack: 0.1, decay: 0.3, release: 2, }, filterEnvelope: { attack: 0.001, decay: 0.01, sustain: 0.5, baseFrequency: 200, octaves: 2.6 } };
 				let snareNoiseSynth = { volume: -5, envelope: { attack: 0.001, decay: 0.2, sustain: 0 }, filterEnvelope: { attack: 0.001, decay: 0.1, sustain: 0 } };
 
