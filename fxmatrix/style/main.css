@@ -30,7 +30,7 @@ html, body {
 	position: relative;
 	overflow-y: hidden;
 	overflow-x: hidden;
-	font-family:fantasy
+	font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
 }
 
 div#content {
@@ -58,7 +58,7 @@ div#output {
             box-sizing: border-box;
 }
 
-div#title {
+#title {
 	font-size: 2em;
 	color: red;
 }
